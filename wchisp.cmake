@@ -2,17 +2,17 @@ message(STATUS "Testing for local wchisp installation...")
 execute_process(COMMAND wchisp RESULT_VARIABLE WCHISP_RESULT)
 
 if(NOT WCHISP_RESULT EQUAL 0)
-    message(FATAL_ERROR "wchisp not found")
-    set(LOCAL_WCHISP OFF)
+    message(STATUS "wchisp not found")
+    set(DOWNLOAD_WCHISP ON)
 else()
     message(STATUS "wchisp found")
-    set(DOWNLOAD_WCHISP ON)
+    set(DOWNLOAD_WCHISP OFF)
 endif()
 
 
 set(WCHISP_COMMAND wchisp)
 
-if(!LOCAL_WCHISP)
+if(DOWNLOAD_WCHISP)
 
     if(LINUX)
         message(STATUS "Setting up wchisp for Linux...")
