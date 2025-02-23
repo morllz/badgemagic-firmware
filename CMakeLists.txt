@@ -6,11 +6,20 @@ cmake_minimum_required(VERSION 3.20)
 # includes compiler, linker, objcopy, size
 include(mrs_toolchain.cmake)
 
+
+########################################
+# wchisp
+########################################
+# only get downloaded if no local install is found
+include(wchisp.cmake)
+
+
 ######################################
 # project
 ########################################
 message(STATUS "Setting up project: badgemagic-firmware")
 project(badgemagic-firmware C ASM)
+
 
 ########################################
 # building variables
@@ -19,6 +28,7 @@ option(DEBUG "Enable debugging" OFF)
 option(USBC_VERSION "Build for USB-C version" ON)
 
 set(OPT "-Os")
+
 
 ########################################
 # Get current version
@@ -33,17 +43,20 @@ else()
     message(STATUS "Project version: ${VERSION}")
 endif()
 
+
 ########################################
 # target
 ########################################
 set(TARGET badgemagic-ch582)
 message(STATUS "Target set to: ${TARGET}")
 
+
 ########################################
 # paths
 ########################################
 set(BUILD_DIR ${CMAKE_BINARY_DIR}/build)
 message(STATUS "Build directory: ${BUILD_DIR}")
+
 
 ########################################
 # source
@@ -104,6 +117,7 @@ set(ASM_SOURCES
     CH5xx_ble_firmware_library/Startup/startup_CH583.S
 )
 
+
 ########################################
 # includes
 ########################################
@@ -114,6 +128,7 @@ include_directories(
     CH5xx_ble_firmware_library/Core
     CH5xx_ble_firmware_library/BLE
 )
+
 
 ########################################
 # CFLAGS
@@ -153,6 +168,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DVERSION='\"${VERSION}\"' -DVERSION_ABBR='\
 # Generate dependency information
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -MMD -MP")
 
+
 ########################################
 # LDFLAGS
 ########################################
@@ -166,6 +182,7 @@ set(LIBS
 
 set(CMAKE_EXE_LINKER_FLAGS "${MCU} -mno-save-restore -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Wunused -Wuninitialized")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T ${LDSCRIPT} -nostartfiles -Wl,--gc-sections -Wl,-Map=${BUILD_DIR}/${TARGET}.map --specs=nano.specs --specs=nosys.specs")
+
 
 ########################################
 # build
@@ -196,21 +213,23 @@ add_custom_command(TARGET ${TARGET} POST_BUILD
     COMMENT "Generating HEX and BIN files..."
 )
 
+
 ########################################
 # program
 ########################################
-message(STATUS "Adding programming targets...")
-add_custom_target(program
-    COMMAND sudo wch-openocd -f /usr/share/wch-openocd/openocd/scripts/interface/wch-riscv.cfg -c 'init; halt; program ${BUILD_DIR}/${TARGET}.elf; reset; wlink_reset_resume; exit;'
-    DEPENDS ${TARGET}
-    COMMENT "Flashing firmware using wch-openocd..."
-)
+#message(STATUS "Adding programming targets...")
+#add_custom_target(program
+#    COMMAND sudo wch-openocd -f /usr/share/wch-openocd/openocd/scripts/interface/wch-riscv.cfg -c 'init; halt; program ${BUILD_DIR}/${TARGET}.elf; reset; wlink_reset_resume; exit;'
+#    DEPENDS ${TARGET}
+#    COMMENT "Flashing firmware using wch-openocd..."
+#)
 
 add_custom_target(isp
-    COMMAND wchisp flash ${BUILD_DIR}/${TARGET}.bin
+    COMMAND ${WCHISP_COMMAND} flash ${BUILD_DIR}/${TARGET}.bin
     DEPENDS ${TARGET}
     COMMENT "Flashing firmware using wchisp..."
 )
+
 
 ########################################
 # clean up

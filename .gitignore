@@ -11,9 +11,13 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
+.cmake
 
 # MRS Toolchain
 MRS_Toolchain
+
+# whcisp
+wchisp
 
 # Buildfiles
 build
