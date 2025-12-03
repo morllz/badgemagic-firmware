@@ -4,16 +4,38 @@ Hardware details and information to build an open firmware for Bluetooth LED bad
 
 ## Installation
 
+### Unix
 Install [wchisp](https://github.com/ch32-rs/wchisp?tab=readme-ov-file#installing).
 
 Download prebuilt binaries from [release](https://github.com/fossasia/badgemagic-firmware/releases) or [the latest development builds](https://github.com/fossasia/badgemagic-firmware/tree/bin).
 
-Make sure the battery is disconnected. Press and hold KEY2 (the button near the
-USB port) while plugging in the USB to enter the bootloader. Then run:
+Make the chip enter bootloader mode (ISP mode) by power cycling the chip while
+the boot pin is pulled down in one of two ways:
+
+- Disconnect the battery, press and hold KEY2 (the button near the USB port)
+  while plugging in the USB to enter the bootloader.
+- Alternatively, connect the USB, press and hold KEY2, then short and release
+  the C3 capacitor.
+
+Then check `dmesg` if the chip has entered the ISP mode with idVendor=4348 and
+idProduct=55e0.
+
+![c3](assets/burn-badge.svg)
+
+Then run:
 
 ```sh
+wchisp config reset
 wchisp flash badgemagic-ch582.bin
 ```
+
+### Windows
+Install and run [wchisp studio](https://www.wch-ic.com/downloads/WCHISPTool_Setup_exe.html)
+Connect the badge via USB and enter bootloader mode.
+
+The device will automatically appear in the UI.
+
+Select the `badgemagic-ch582.bin` file and click 'Download'.
 
 Where badgemagic-ch582.bin is the binary downloaded above, the .elf file also
 works.
